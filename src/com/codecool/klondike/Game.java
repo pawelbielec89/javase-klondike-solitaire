@@ -1,6 +1,7 @@
 package com.codecool.klondike;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import javafx.collections.FXCollections;
@@ -108,7 +109,9 @@ public class Game extends Pane {
     int discardPileAmount = discardPile.numOfCards();
     for (int i = 0; i < discardPileAmount; i++) {
       discardPile.getTopCard().moveToPile(stockPile);
+      stockPile.getTopCard().flip();
     }
+    Collections.shuffle(stockPile.getCards());
     System.out.println("Stock refilled from discard pile.");
   }
 
