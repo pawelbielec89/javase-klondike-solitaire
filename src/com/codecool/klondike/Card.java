@@ -12,7 +12,7 @@ public class Card extends ImageView {
   private int suit;
   private int rank;
   private boolean faceDown;
-
+  private boolean isBlack;
   private Image backFace;
   private Image frontFace;
   private Pile containingPile;
@@ -28,6 +28,11 @@ public class Card extends ImageView {
     this.rank = rank;
     this.faceDown = faceDown;
     this.dropShadow = new DropShadow(2, Color.gray(0, 0.75));
+    if (this.suit == 1 || this.suit == 2) {
+      this.isBlack = false;
+    } else {
+      this.isBlack = true;
+    }
     backFace = cardBackImage;
     frontFace = cardFaceImages.get(getShortName());
     setImage(faceDown ? backFace : frontFace);
@@ -40,6 +45,10 @@ public class Card extends ImageView {
 
   public int getRank() {
     return rank;
+  }
+
+  public boolean getIsBlack() {
+    return isBlack;
   }
 
   public boolean isFaceDown() {
@@ -78,8 +87,11 @@ public class Card extends ImageView {
   }
 
   public static boolean isOppositeColor(Card card1, Card card2) {
-    // TODO
-    return true;
+    if (card1.getIsBlack() == card2.getIsBlack()) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
   public static boolean isSameSuit(Card card1, Card card2) {
