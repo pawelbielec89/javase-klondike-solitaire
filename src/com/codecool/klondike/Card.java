@@ -55,6 +55,10 @@ public class Card extends ImageView {
     return faceDown;
   }
 
+  public void setFaceDown() {
+    this.faceDown = true;
+  }
+
   public String getShortName() {
     return "S" + suit + "R" + rank;
   }
