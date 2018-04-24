@@ -85,4 +85,10 @@ public class Pile extends Pane {
     FOUNDATION,
     TABLEAU
   }
+
+  public void tableauReverseCardsHandler(Pile destPile) {
+    int cardsAmount = this.cards.size();
+    Card card = this.cards.get(cardsAmount);
+    card.moveToPile(destPile);
+  }
 }

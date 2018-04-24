@@ -39,6 +39,10 @@ public class Game extends Pane {
           card.flip();
           card.setMouseTransparent(false);
           System.out.println("Placed " + card + " to the waste.");
+        } else if (card.getContainingPile().getPileType() == Pile.PileType.TABLEAU 
+                    && card == card.getContainingPile().getTopCard()
+                    && card.isFaceDown()) {
+          card.flip();
         }
       };
 
@@ -98,6 +102,16 @@ public class Game extends Pane {
     dealCards();
   }
 
+  private void setCardsOnTableau() {
+    for (int i = 0; i < 7; i++) {
+      for (int j = i; j >= 0; j--) {
+        Card card = stockPile.getTopCard();
+        card.moveToPile(tableauPiles.get(i));
+        if (j == 0) card.flip();
+      }
+  }
+  }
+
   public void addMouseEventHandlers(Card card) {
     card.setOnMousePressed(onMousePressedHandler);
     card.setOnMouseDragged(onMouseDraggedHandler);
@@ -112,6 +126,7 @@ public class Game extends Pane {
       stockPile.getTopCard().flip();
     }
     Collections.shuffle(stockPile.getCards());
+
     System.out.println("Stock refilled from discard pile.");
   }
 
@@ -129,6 +144,7 @@ public class Game extends Pane {
     }
     return result;
   }
+
 
   private boolean isOverPile(Card card, Pile pile) {
     if (pile.isEmpty()) return card.getBoundsInParent().intersects(pile.getBoundsInParent());
@@ -180,6 +196,7 @@ public class Game extends Pane {
       tableauPiles.add(tableauPile);
       getChildren().add(tableauPile);
     }
+
   }
 
   public void dealCards() {
@@ -191,6 +208,7 @@ public class Game extends Pane {
           addMouseEventHandlers(card);
           getChildren().add(card);
         });
+    setCardsOnTableau();
   }
 
   public void setTableBackground(Image tableBackground) {
