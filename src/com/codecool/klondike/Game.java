@@ -4,10 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Orientation;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
@@ -170,7 +174,18 @@ public class Game extends Pane {
   }
 
   private void initToolbar() {
-    ToolBar toolbar = new ToolBar(new Button("Undo"), new Button("Restart"), new Button("Exit"));
+    Button undoButt = new Button("Undo");
+    Button restartButt = new Button("Restart");
+    Button exitButt = new Button("Exit");
+
+    exitButt.setOnAction(
+        new EventHandler<ActionEvent>() {
+          @Override
+          public void handle(ActionEvent e) {
+            confirmation();
+          }
+        });
+    ToolBar toolbar = new ToolBar(undoButt, restartButt, exitButt);
     toolbar.setBackground(
         new Background(
             new BackgroundImage(
@@ -183,6 +198,18 @@ public class Game extends Pane {
     toolbar.setLayoutY(0);
     toolbar.setOrientation(Orientation.VERTICAL);
     getChildren().add(toolbar);
+  }
+
+  private void confirmation() {
+    Alert alert = new Alert(AlertType.CONFIRMATION);
+    alert.setTitle("Leave game");
+    alert.setHeaderText("You going to leave game");
+    alert.setContentText("Are you sure?");
+
+    Optional<ButtonType> result = alert.showAndWait();
+    if (result.get() == ButtonType.OK) {
+      System.exit(0);
+    }
   }
 
   private void initPiles() {
