@@ -6,6 +6,9 @@ import java.util.Iterator;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
+import javafx.scene.control.*;
+import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -39,9 +42,9 @@ public class Game extends Pane {
           card.flip();
           card.setMouseTransparent(false);
           System.out.println("Placed " + card + " to the waste.");
-        } else if (card.getContainingPile().getPileType() == Pile.PileType.TABLEAU 
-                    && card == card.getContainingPile().getTopCard()
-                    && card.isFaceDown()) {
+        } else if (card.getContainingPile().getPileType() == Pile.PileType.TABLEAU
+            && card == card.getContainingPile().getTopCard()
+            && card.isFaceDown()) {
           card.flip();
         }
       };
@@ -98,6 +101,7 @@ public class Game extends Pane {
 
   public Game() {
     deck = Card.createNewDeck();
+    initToolbar();
     initPiles();
     dealCards();
   }
@@ -109,7 +113,7 @@ public class Game extends Pane {
         card.moveToPile(tableauPiles.get(i));
         if (j == 0) card.flip();
       }
-  }
+    }
   }
 
   public void addMouseEventHandlers(Card card) {
@@ -145,7 +149,6 @@ public class Game extends Pane {
     return result;
   }
 
-
   private boolean isOverPile(Card card, Pile pile) {
     if (pile.isEmpty()) return card.getBoundsInParent().intersects(pile.getBoundsInParent());
     else return card.getBoundsInParent().intersects(pile.getTopCard().getBoundsInParent());
@@ -164,6 +167,22 @@ public class Game extends Pane {
     System.out.println(msg);
     MouseUtil.slideToDest(draggedCards, destPile);
     draggedCards.clear();
+  }
+
+  private void initToolbar() {
+    ToolBar toolbar = new ToolBar(new Button("Undo"), new Button("Restart"), new Button("Exit"));
+    toolbar.setBackground(
+        new Background(
+            new BackgroundImage(
+                new Image("/table/green.png"),
+                BackgroundRepeat.REPEAT,
+                BackgroundRepeat.REPEAT,
+                BackgroundPosition.CENTER,
+                BackgroundSize.DEFAULT)));
+    toolbar.setLayoutX(0);
+    toolbar.setLayoutY(0);
+    toolbar.setOrientation(Orientation.VERTICAL);
+    getChildren().add(toolbar);
   }
 
   private void initPiles() {
@@ -196,7 +215,6 @@ public class Game extends Pane {
       tableauPiles.add(tableauPile);
       getChildren().add(tableauPile);
     }
-
   }
 
   public void dealCards() {
