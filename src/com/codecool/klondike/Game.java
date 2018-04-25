@@ -68,16 +68,32 @@ public class Game extends Pane {
         double offsetX = e.getSceneX() - dragStartX;
         double offsetY = e.getSceneY() - dragStartY;
         
-        draggedCards.clear();           
-        draggedCards.add(card);
+        draggedCards.clear();
+        if (card == activePile.getTopCard()) { 
+          draggedCards.add(card);
+          card.getDropShadow().setRadius(20);
+          card.getDropShadow().setOffsetX(10);
+          card.getDropShadow().setOffsetY(10);
+  
+          card.toFront();
+          card.setTranslateX(offsetX);
+          card.setTranslateY(offsetY);
+        } else {
+          for (int i = activePile.getCards().indexOf(card); i < activePile.getCards().size(); i++) {
+            Card dCard = activePile.getCards().get(i);
+            draggedCards.add(dCard);
+            dCard.getDropShadow().setRadius(20);
+            dCard.getDropShadow().setOffsetX(10);
+            dCard.getDropShadow().setOffsetY(10);
+    
+            dCard.toFront();
+            dCard.setTranslateX(offsetX+i*10);
+            dCard.setTranslateY(offsetY+i*5);
+            
+          }
+        }
 
-        card.getDropShadow().setRadius(20);
-        card.getDropShadow().setOffsetX(10);
-        card.getDropShadow().setOffsetY(10);
-
-        card.toFront();
-        card.setTranslateX(offsetX);
-        card.setTranslateY(offsetY);
+    
         
       };
 
@@ -88,7 +104,6 @@ public class Game extends Pane {
         }
         Card card = (Card) e.getSource();
         Pile pile = getValidIntersectingPile(card, tableauPiles);
-        // TODO
         if (pile != null) {
           handleValidMove(card, pile);
         } else {
@@ -141,7 +156,6 @@ public class Game extends Pane {
   }
 
   public boolean isMoveValid(Card card, Pile destPile) {
-    // TODO
     if (destPile.getPileType() == PileType.TABLEAU){
       if (destPile.numOfCards() < 1){
         if( card.getRank() != 13) { 
