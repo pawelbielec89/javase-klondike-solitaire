@@ -4,6 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+
+import com.codecool.klondike.Pile.PileType;
+
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.scene.image.Image;
@@ -64,8 +67,8 @@ public class Game extends Pane {
         if (activePile.getPileType() == Pile.PileType.STOCK) return;
         double offsetX = e.getSceneX() - dragStartX;
         double offsetY = e.getSceneY() - dragStartY;
-
-        draggedCards.clear();
+        
+        draggedCards.clear();           
         draggedCards.add(card);
 
         card.getDropShadow().setRadius(20);
@@ -75,11 +78,14 @@ public class Game extends Pane {
         card.toFront();
         card.setTranslateX(offsetX);
         card.setTranslateY(offsetY);
+        
       };
 
   private EventHandler<MouseEvent> onMouseReleasedHandler =
       e -> {
-        if (draggedCards.isEmpty()) return;
+        if (draggedCards.isEmpty()) { 
+          return;
+        }
         Card card = (Card) e.getSource();
         Pile pile = getValidIntersectingPile(card, tableauPiles);
         // TODO
@@ -87,7 +93,7 @@ public class Game extends Pane {
           handleValidMove(card, pile);
         } else {
           draggedCards.forEach(MouseUtil::slideBack);
-          draggedCards = null;
+          draggedCards.clear();
         }
       };
 
@@ -101,6 +107,10 @@ public class Game extends Pane {
     initPiles();
     dealCards();
   }
+
+/** 
+ * Sets cards on tableau in standard klondike way.
+ */
 
   private void setCardsOnTableau() {
     for (int i = 0; i < 7; i++) {
@@ -132,6 +142,20 @@ public class Game extends Pane {
 
   public boolean isMoveValid(Card card, Pile destPile) {
     // TODO
+    if (destPile.getPileType() == PileType.TABLEAU){
+      if (destPile.numOfCards() < 1){
+        if( card.getRank() != 13) { 
+          return false; 
+        }
+        return true;
+      } else if (destPile.getTopCard().getRank() - card.getRank() != 1) {
+        System.out.println(destPile.getTopCard().getRank() + "benizzz");
+        return false;
+      }  else if (destPile.getTopCard().getSuit() > 2 && card.getSuit() > 2
+                  || destPile.getTopCard().getSuit() < 3 && card.getSuit() < 3) {
+        return false;
+      }
+    }
     return true;
   }
 
@@ -141,7 +165,7 @@ public class Game extends Pane {
       if (!pile.equals(card.getContainingPile())
           && isOverPile(card, pile)
           && isMoveValid(card, pile)) result = pile;
-    }
+    } 
     return result;
   }
 
