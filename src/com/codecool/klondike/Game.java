@@ -171,9 +171,9 @@ public class Game extends Pane {
 
   public boolean canDragOnTableau(Card card, Pile destPile) {
     if (destPile.numOfCards() < 1){
-      if (card.getRank() != 13) { 
-        return false; 
-      }
+      // if (card.getRank() != 13) { 
+      //   return false; 
+      // }
       return true;
     } else if (destPile.getTopCard().getRank() - card.getRank() != 1) {
       return false;
