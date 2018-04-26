@@ -1,11 +1,12 @@
 package com.codecool.klondike;
 
-import com.codecool.klondike.Pile.PileType;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -22,7 +23,6 @@ public class Game extends Pane {
   private Pile discardPile;
   private List<Pile> foundationPiles = FXCollections.observableArrayList();
   private List<Pile> tableauPiles = FXCollections.observableArrayList();
-  private List<Pile> dragablePiles = FXCollections.observableArrayList();
 
   private double dragStartX, dragStartY;
   private List<Card> draggedCards = FXCollections.observableArrayList();
@@ -115,6 +115,7 @@ public class Game extends Pane {
     } else {
       System.out.println("Not yet!");
     }
+    return false;
   }
 
   public Game() {
@@ -147,6 +148,8 @@ public class Game extends Pane {
       discardPile.getTopCard().moveToPile(stockPile);
       stockPile.getTopCard().flip();
     }
+    Collections.shuffle(stockPile.getCards());
+
     System.out.println("Stock refilled from discard pile.");
   }
 
@@ -183,7 +186,6 @@ public class Game extends Pane {
         || destPile.getTopCard().getSuit() != card.getSuit()) {
       return false;
     }
-    return true;
   }
 
   private Pile getValidIntersectingPile(Card card, List<Pile> piles) {
