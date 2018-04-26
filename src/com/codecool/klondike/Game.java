@@ -1,7 +1,6 @@
 package com.codecool.klondike;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -147,8 +146,6 @@ public class Game extends Pane {
       discardPile.getTopCard().moveToPile(stockPile);
       stockPile.getTopCard().flip();
     }
-    Collections.shuffle(stockPile.getCards());
-
     System.out.println("Stock refilled from discard pile.");
   }
 
@@ -161,8 +158,7 @@ public class Game extends Pane {
         return true;
       } else if (destPile.getTopCard().getRank() - card.getRank() != 1) {
         return false;
-      }  else if (destPile.getTopCard().getSuit() > 2 && card.getSuit() > 2
-                  || destPile.getTopCard().getSuit() < 3 && card.getSuit() < 3) {
+      }  else if (!Card.isOppositeColor(destPile.getTopCard(), card)) {
         return false;
       }
     }

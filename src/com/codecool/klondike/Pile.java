@@ -45,8 +45,11 @@ public class Pile extends Pane {
     return cards.isEmpty();
   }
 
-  public void clear() {
-    // TODO
+  public void clear(Pile stockPile) {
+    int cardsAmount = this.numOfCards();
+    for (int card = 0; card < cardsAmount; card++) {
+      this.getTopCard().moveToPile(stockPile);
+    }
   }
 
   public void addCard(Card card) {
