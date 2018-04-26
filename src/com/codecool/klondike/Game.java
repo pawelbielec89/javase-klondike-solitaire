@@ -116,6 +116,27 @@ public class Game extends Pane {
   public void gameWon() {
     if (isGameWon()) {
       System.out.println("Game is won!");
+      Alert alert = new Alert(AlertType.CONFIRMATION);
+      alert.setTitle("Game won!");
+      alert.setHeaderText("You won the game!");
+      alert.setContentText("Do you want to play once more?");
+
+      Optional<ButtonType> result = alert.showAndWait();
+      if (result.get() == ButtonType.OK) {
+        for (int i = 0; i < 7; i++) {
+          tableauPiles.get(i).moveTo(stockPile);
+        }
+        for (int i = 0; i < 4; i++) {
+          foundationPiles.get(i).moveTo(stockPile);
+        }
+        discardPile.moveTo(stockPile);
+        System.out.println(stockPile.numOfCards());
+        stockPile.flipFaceUpCards();
+        setCardsOnTableau();
+        putStockToDiscard(stockPile);
+        refillStockFromDiscard(discardPile);
+        System.out.println(stockPile.numOfCards());
+      }
     } else {
       System.out.println("Not yet!");
     }
@@ -150,7 +171,7 @@ public class Game extends Pane {
   private void setCardsOnTableau() {
     for (int i = 0; i < 7; i++) {
       for (int j = i; j >= 0; j--) {
-        Card card = stockPile.getTopCard();
+        Card card = stockPile.getRandomCard();
         card.moveToPile(tableauPiles.get(i));
         if (j == 0) card.flip();
       }
@@ -169,6 +190,15 @@ public class Game extends Pane {
     for (int i = 0; i < discardPileAmount; i++) {
       discardPile.getTopCard().moveToPile(stockPile);
       stockPile.getTopCard().flip();
+    }
+    System.out.println("Stock refilled from discard pile.");
+  }
+
+  public void putStockToDiscard(Pile stockPile) {
+    int stockPileAmount = stockPile.numOfCards();
+    for (int i = 0; i < stockPileAmount; i++) {
+      stockPile.getTopCard().moveToPile(discardPile);
+      discardPile.getTopCard().flip();
     }
     System.out.println("Stock refilled from discard pile.");
   }
@@ -308,6 +338,8 @@ public class Game extends Pane {
       stockPile.flipFaceUpCards();
       // stockPile.shufflePile();
       setCardsOnTableau();
+      putStockToDiscard(stockPile);
+      refillStockFromDiscard(discardPile);
       System.out.println(stockPile.numOfCards());
     }
   }
@@ -385,6 +417,8 @@ public class Game extends Pane {
           getChildren().add(card);
         });
     setCardsOnTableau();
+    putStockToDiscard(stockPile);
+    refillStockFromDiscard(discardPile);
   }
 
   public void setTableBackground(Image tableBackground) {

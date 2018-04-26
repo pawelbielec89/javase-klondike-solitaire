@@ -73,6 +73,12 @@ public class Pile extends Pane {
     else return cards.get(cards.size() - 1);
   }
 
+  public Card getRandomCard() {
+    int randomNumber = (int) (Math.random() * cards.size());
+    if (cards.isEmpty()) return null;
+    else return cards.get(randomNumber);
+  }
+
   public Card getLowerCard(Card card) {
     if (cards.indexOf(card) < 1) return null;
     else return cards.get(cards.indexOf(card) - 1);
