@@ -104,8 +104,8 @@ public class Game extends Pane {
   }
 
   public Game() {
-    deck = Card.createNewDeck();
     initToolbar();
+    deck = Card.createNewDeck();
     initPiles();
     dealCards();
   }
@@ -182,9 +182,17 @@ public class Game extends Pane {
         new EventHandler<ActionEvent>() {
           @Override
           public void handle(ActionEvent e) {
-            confirmation();
+            exitConfirmation();
           }
         });
+    restartButt.setOnAction(
+        new EventHandler<ActionEvent>() {
+          @Override
+          public void handle(ActionEvent e) {
+            restartConfirmation();
+          }
+        });
+
     ToolBar toolbar = new ToolBar(undoButt, restartButt, exitButt);
     toolbar.setBackground(
         new Background(
@@ -200,7 +208,7 @@ public class Game extends Pane {
     getChildren().add(toolbar);
   }
 
-  private void confirmation() {
+  private void exitConfirmation() {
     Alert alert = new Alert(AlertType.CONFIRMATION);
     alert.setTitle("Leave game");
     alert.setHeaderText("You going to leave game");
@@ -210,6 +218,16 @@ public class Game extends Pane {
     if (result.get() == ButtonType.OK) {
       System.exit(0);
     }
+  }
+
+  private void restartConfirmation() {
+    Alert alert = new Alert(AlertType.CONFIRMATION);
+    alert.setTitle("Restarting game");
+    alert.setHeaderText("You going to restart game");
+    alert.setContentText("Are you sure?");
+
+    Optional<ButtonType> result = alert.showAndWait();
+    if (result.get() == ButtonType.OK) {}
   }
 
   private void initPiles() {
