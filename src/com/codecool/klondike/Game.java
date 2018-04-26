@@ -25,6 +25,7 @@ public class Game extends Pane {
   private Pile discardPile;
   private List<Pile> foundationPiles = FXCollections.observableArrayList();
   private List<Pile> tableauPiles = FXCollections.observableArrayList();
+  private List<Pile> dragablePiles = FXCollections.observableArrayList();
 
   private double dragStartX, dragStartY;
   private List<Card> draggedCards = FXCollections.observableArrayList();
@@ -46,7 +47,7 @@ public class Game extends Pane {
                     && card == card.getContainingPile().getTopCard()
                     && card.isFaceDown()) {
           card.flip();
-        }
+        } 
       };
 
   private EventHandler<MouseEvent> stockReverseCardsHandler =
@@ -67,7 +68,7 @@ public class Game extends Pane {
         if (activePile.getPileType() == Pile.PileType.STOCK) return;
         double offsetX = e.getSceneX() - dragStartX;
         double offsetY = e.getSceneY() - dragStartY;
-        
+
         draggedCards.clear();
         if (card == activePile.getTopCard() 
             || (activePile != discardPile && !card.isFaceDown())) { 
@@ -81,7 +82,9 @@ public class Game extends Pane {
           return;
         }
         Card card = (Card) e.getSource();
-        Pile pile = getValidIntersectingPile(card, tableauPiles);
+        dragablePiles.addAll(tableauPiles);
+        dragablePiles.addAll(foundationPiles);
+        Pile pile = getValidIntersectingPile(card, dragablePiles);
         if (pile != null) {
           handleValidMove(card, pile);
         } else {
@@ -152,7 +155,7 @@ public class Game extends Pane {
   public boolean isMoveValid(Card card, Pile destPile) {
     if (destPile.getPileType() == PileType.TABLEAU){
       if (destPile.numOfCards() < 1){
-        if( card.getRank() != 13) { 
+        if (card.getRank() != 13) { 
           return false; 
         }
         return true;
@@ -161,6 +164,11 @@ public class Game extends Pane {
       }  else if (!Card.isOppositeColor(destPile.getTopCard(), card)) {
         return false;
       }
+    } else if (destPile.getPileType() == PileType.FOUNDATION) {
+        if (destPile.numOfCards() < 1) {
+          if (card.getRank() != 1) return false;
+        } else if (card.getRank() - destPile.getTopCard().getRank() != 1
+                    || destPile.getTopCard().getSuit() != card.getSuit()) return false;
     }
     return true;
   }
