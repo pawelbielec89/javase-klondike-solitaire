@@ -22,7 +22,7 @@ public class Card extends ImageView {
 
   private static final Map<Integer, SuitType> suitMap = new HashMap<>();
   private static final Map<Integer, RankType> rankMap = new HashMap<>();
-  private static final Map<String, Image> cardFaceImages = new HashMap<>();
+  public static final Map<String, Image> cardFaceImages = new HashMap<>();
   private static final Map<SuitType, Boolean> isBlackList = new HashMap<>();
 
   static {
@@ -115,8 +115,8 @@ public class Card extends ImageView {
   }
 
   public void autoFlip() {
-    if (this.getContainingPile().getPileType() == Pile.PileType.TABLEAU
-        && this.isFaceDown()) this.flip();
+    if (this.getContainingPile().getPileType() == Pile.PileType.TABLEAU && this.isFaceDown())
+      this.flip();
   }
 
   public void flip() {
@@ -155,8 +155,8 @@ public class Card extends ImageView {
     return result;
   }
 
-  public static void loadCardImages(String catalogue_name, String imageFormat) {
-    cardBackImage = new Image(catalogue_name + "back.jpg");
+  public static void loadCardImages(String catalogue_name) {
+    cardBackImage = new Image(catalogue_name + "back.png");
     String suitName = "";
     int suitToPass;
     for (int suit = 1; suit < 5; suit++) {
@@ -166,12 +166,11 @@ public class Card extends ImageView {
       for (int rank = 1; rank < 14; rank++) {
         String cardName = suitName + rank;
         String cardId = "S" + suitToPass + "R" + rank;
-        String imageFileName = catalogue_name + cardName + imageFormat;
+        String imageFileName = catalogue_name + cardName + ".png";
         cardFaceImages.put(cardId, new Image(imageFileName));
       }
     }
   }
-
 
   public enum SuitType {
     HEARTS(1, "hearts"),
@@ -226,5 +225,10 @@ public class Card extends ImageView {
     int getIndex() {
       return this.index;
     }
+  }
+
+  public void changeImage() {
+    frontFace = cardFaceImages.get(getShortName());
+    setImage(faceDown ? backFace : frontFace);
   }
 }

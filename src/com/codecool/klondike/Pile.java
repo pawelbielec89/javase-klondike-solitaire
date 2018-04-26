@@ -45,7 +45,7 @@ public class Pile extends Pane {
     return cards.isEmpty();
   }
 
-  public void clear(Pile stockPile) {
+  public void moveTo(Pile stockPile) {
     int cardsAmount = this.numOfCards();
     for (int card = 0; card < cardsAmount; card++) {
       this.getTopCard().moveToPile(stockPile);
@@ -104,5 +104,27 @@ public class Pile extends Pane {
     int cardsAmount = this.cards.size();
     Card card = this.cards.get(cardsAmount);
     card.moveToPile(destPile);
+  }
+
+  public void shufflePile() {
+    FXCollections.shuffle(cards);
+  }
+
+  public void flushPile() {
+    cards.clear();
+  }
+
+  public void flipFaceUpCards() {
+    for (int i = 0; i < numOfCards(); i++) {
+      if (cards.get(i).isFaceDown() == false) {
+        cards.get(i).flip();
+      }
+    }
+  }
+
+  public void changeImages() {
+    for (Card card : cards) {
+      card.changeImage();
+    }
   }
 }

@@ -1,14 +1,21 @@
 package com.codecool.klondike;
 
-import com.codecool.klondike.Pile.PileType;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
+import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
@@ -16,7 +23,6 @@ import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.Pane;
 
 public class Game extends Pane {
-
   private List<Card> deck = new ArrayList<>();
 
   private Pile stockPile;
@@ -32,6 +38,8 @@ public class Game extends Pane {
   private static double FOUNDATION_GAP = 0;
   private static double TABLEAU_GAP = 30;
 
+  private static String actualCatalogueName = "card_images";
+
   private EventHandler<MouseEvent> onMouseClickedHandler =
       e -> {
         Card card = (Card) e.getSource();
@@ -45,7 +53,7 @@ public class Game extends Pane {
             && card == card.getContainingPile().getTopCard()
             && card.isFaceDown()) {
           card.flip();
-        } 
+        }
       };
 
   private EventHandler<MouseEvent> stockReverseCardsHandler =
@@ -82,34 +90,38 @@ public class Game extends Pane {
         Card card = (Card) e.getSource();
         Pile pile = getValidIntersectingPile(card, dragablePiles);
         if (pile != null) {
+
           handleValidMove(card, pile);
+
         } else {
           draggedCards.forEach(MouseUtil::slideBack);
           draggedCards.clear();
         }
+        gameWon();
       };
 
-
   public boolean isGameWon() {
-    int tableauEmpty = 0;
-    for (int tableauPileIndex = 0; tableauPileIndex < tableauPiles.size(); tableauPileIndex++) {
-      if (tableauPiles.get(tableauPileIndex).isEmpty()) {
-        tableauEmpty += 0;
-      } else {
-        tableauEmpty++;
-      }
+    int allCards = 52;
+    int pileFull = 0;
+    for (int foundationPileIndex = 0; foundationPileIndex < 4; foundationPileIndex++) {
+      pileFull += foundationPiles.get(foundationPileIndex).numOfCards();
     }
-
-    if (stockPile.isEmpty() && discardPile.isEmpty() && tableauEmpty == 0) {
-      System.out.print("WYGRANAAAAAAAAAAAAAAAAA!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    if (pileFull == (allCards - 1)) {
       return true;
+    }
+    return false;
+  }
+
+  public void gameWon() {
+    if (isGameWon()) {
+      System.out.println("Game is won!");
     } else {
-      //System.out.print("Jeszcze nie wygrales!");
-      return false;
+      System.out.println("Not yet!");
     }
   }
 
   public Game() {
+    initToolbar();
     deck = Card.createNewDeck();
     initPiles();
     dealCards();
@@ -161,25 +173,26 @@ public class Game extends Pane {
   }
 
   public boolean isMoveValid(Card card, Pile destPile) {
-    if (destPile.getPileType() == PileType.TABLEAU){
+    if (destPile.getPileType() == Pile.PileType.TABLEAU) {
       return canDragOnTableau(card, destPile);
-    } else if (destPile.getPileType() == PileType.FOUNDATION) {
+    } else if (destPile.getPileType() == Pile.PileType.FOUNDATION) {
       return canDragOnFoundation(card, destPile);
-    }  
+    }
     return true;
   }
 
   public boolean canDragOnTableau(Card card, Pile destPile) {
-    if (destPile.numOfCards() < 1){
-      // if (card.getRank() != 13) { 
-      //   return false; 
-      // }
+    if (destPile.numOfCards() < 1) {
+      if (card.getRank() != 13) {
+        return false;
+      }
       return true;
     } else if (destPile.getTopCard().getRank() - card.getRank() != 1) {
       return false;
-    }  else if (!Card.isOppositeColor(destPile.getTopCard(), card)) {
+    } else if (!Card.isOppositeColor(destPile.getTopCard(), card)) {
       return false;
     }
+
     return true;
   }
 
@@ -189,9 +202,9 @@ public class Game extends Pane {
         return false;
       }
     } else if (card.getRank() - destPile.getTopCard().getRank() != 1
-                || destPile.getTopCard().getSuit() != card.getSuit()) {
-        return false;
-    } 
+        || destPile.getTopCard().getSuit() != card.getSuit()) {
+      return false;
+    }
     return true;
   }
 
@@ -241,7 +254,7 @@ public class Game extends Pane {
 
   private void handleValidMove(Card card, Pile destPile) {
     String msg = null;
-    Card lowerCard = card.getContainingPile().getLowerCard(card);    
+    Card lowerCard = card.getContainingPile().getLowerCard(card);
 
     if (destPile.isEmpty()) {
       if (destPile.getPileType().equals(Pile.PileType.FOUNDATION))
@@ -251,11 +264,115 @@ public class Game extends Pane {
     } else {
       msg = String.format("Placed %s to %s.", card, destPile.getTopCard());
     }
-    System.out.println(msg);    
+    System.out.println(msg);
     MouseUtil.slideToDest(draggedCards, destPile);
     draggedCards.clear();
     if (lowerCard != null) lowerCard.autoFlip();
     autoFinish();
+  }
+
+  private void initToolbar() {
+    Button undoButt = new Button("Undo");
+    Button restartButt = new Button("Restart");
+    Button exitButt = new Button("Exit");
+    Button changeThemeButt = new Button("Change Theme");
+
+    exitButt.setOnAction(
+        new EventHandler<ActionEvent>() {
+          @Override
+          public void handle(ActionEvent e) {
+            exitConfirmation();
+          }
+        });
+    restartButt.setOnAction(
+        new EventHandler<ActionEvent>() {
+          @Override
+          public void handle(ActionEvent e) {
+            restartConfirmation();
+          }
+        });
+
+    changeThemeButt.setOnAction(
+        new EventHandler<ActionEvent>() {
+          @Override
+          public void handle(ActionEvent e) {
+            changeTheme();
+          }
+        });
+
+    ToolBar toolbar = new ToolBar(undoButt, restartButt, changeThemeButt, exitButt);
+    toolbar.setBackground(new Background(new BackgroundFill(null, null, null)));
+    toolbar.setLayoutX(0);
+    toolbar.setLayoutY(0);
+    toolbar.setOrientation(Orientation.VERTICAL);
+    getChildren().add(toolbar);
+  }
+
+  private void exitConfirmation() {
+    Alert alert = new Alert(AlertType.CONFIRMATION);
+    alert.setTitle("Leave game");
+    alert.setHeaderText("You going to leave game");
+    alert.setContentText("Are you sure?");
+
+    Optional<ButtonType> result = alert.showAndWait();
+    if (result.get() == ButtonType.OK) {
+      System.exit(0);
+    }
+  }
+
+  private void restartConfirmation() {
+    Alert alert = new Alert(AlertType.CONFIRMATION);
+    alert.setTitle("Restarting game");
+    alert.setHeaderText("You going to restart game");
+    alert.setContentText("Are you sure?");
+
+    Optional<ButtonType> result = alert.showAndWait();
+
+    if (result.get() == ButtonType.OK) {
+      for (int i = 0; i < 7; i++) {
+        tableauPiles.get(i).moveTo(stockPile);
+      }
+      for (int i = 0; i < 4; i++) {
+        foundationPiles.get(i).moveTo(stockPile);
+      }
+      discardPile.moveTo(stockPile);
+      System.out.println(stockPile.numOfCards());
+      stockPile.flipFaceUpCards();
+      // stockPile.shufflePile();
+      setCardsOnTableau();
+      System.out.println(stockPile.numOfCards());
+    }
+  }
+
+  public void changeTheme() {
+    if (actualCatalogueName.equals("card_images/")) {
+      actualCatalogueName = "new_card_images/";
+      Card.loadCardImages(actualCatalogueName);
+
+    } else {
+      actualCatalogueName = "card_images/";
+      Card.loadCardImages(actualCatalogueName);
+    }
+    stockPile.changeImages();
+    discardPile.changeImages();
+    for (Pile pile : foundationPiles) {
+      pile.changeImages();
+    }
+    for (Pile pile : tableauPiles) {
+      pile.changeImages();
+    }
+
+    /*
+    Alert alert = new Alert(AlertType.CONFIRMATION);
+    alert.setTitle("Changing theme");
+    alert.setHeaderText("Which theme do you want?");
+    alert.setContentText("Select one");
+    ButtonType optionOne = new ButtonType("One");
+    ButtonType optionTwo = new ButtonType("Two");
+    Image imageOne = new Image(getClass().getResourceAsStream("/card_images/back.jpg"));
+    optionOne.setGraphic(new ImageView(imageOne));
+    Optional<ButtonType> result = alert.showAndWait();
+    */
   }
 
   private void initPiles() {
