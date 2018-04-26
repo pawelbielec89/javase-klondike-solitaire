@@ -115,4 +115,10 @@ public class Pile extends Pane {
       }
     }
   }
+
+  public void changeImages() {
+    for (Card card : cards) {
+      card.changeImage();
+    }
+  }
 }
