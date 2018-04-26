@@ -295,6 +295,7 @@ public class Game extends Pane {
     alert.setContentText("Are you sure?");
 
     Optional<ButtonType> result = alert.showAndWait();
+
     if (result.get() == ButtonType.OK) {
       for (int i = 0; i < 7; i++) {
         tableauPiles.get(i).moveTo(stockPile);
@@ -302,9 +303,10 @@ public class Game extends Pane {
       for (int i = 0; i < 4; i++) {
         foundationPiles.get(i).moveTo(stockPile);
       }
+      discardPile.moveTo(stockPile);
       System.out.println(stockPile.numOfCards());
       stockPile.flipFaceUpCards();
-      stockPile.shufflePile();
+      // stockPile.shufflePile();
       setCardsOnTableau();
       System.out.println(stockPile.numOfCards());
     }
