@@ -16,7 +16,11 @@ public class Klondike extends Application {
 
   @Override
   public void start(Stage primaryStage) {
+<<<<<<< HEAD
     Card.loadCardImages("card_images/");
+=======
+    Card.loadCardImages();
+>>>>>>> parent of d9b27cb... Merge branch 'Dev' of https://github.com/CodecoolKRK20173/javase-klondike-solitaire-pawel-kuba into Dev
     Game game = new Game();
     game.setTableBackground(new Image("/table/green.png"));
 

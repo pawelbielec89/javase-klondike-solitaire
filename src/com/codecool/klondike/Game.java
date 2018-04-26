@@ -32,8 +32,11 @@ public class Game extends Pane {
   private static double FOUNDATION_GAP = 0;
   private static double TABLEAU_GAP = 30;
 
+<<<<<<< HEAD
   private static String actualCatalogueName = "card_images";
 
+=======
+>>>>>>> parent of d9b27cb... Merge branch 'Dev' of https://github.com/CodecoolKRK20173/javase-klondike-solitaire-pawel-kuba into Dev
   private EventHandler<MouseEvent> onMouseClickedHandler =
       e -> {
         Card card = (Card) e.getSource();
@@ -231,6 +234,7 @@ public class Game extends Pane {
     draggedCards.clear();
   }
 
+<<<<<<< HEAD
   private void initToolbar() {
     Button undoButt = new Button("Undo");
     Button restartButt = new Button("Restart");
@@ -333,6 +337,8 @@ public class Game extends Pane {
     */
   }
 
+=======
+>>>>>>> parent of d9b27cb... Merge branch 'Dev' of https://github.com/CodecoolKRK20173/javase-klondike-solitaire-pawel-kuba into Dev
   private void initPiles() {
     stockPile = new Pile(Pile.PileType.STOCK, "Stock", STOCK_GAP);
     stockPile.setBlurredBackground();
