@@ -114,6 +114,11 @@ public class Card extends ImageView {
     destPile.addCard(this);
   }
 
+  public void autoFlip() {
+    if (this.getContainingPile().getPileType() == Pile.PileType.TABLEAU
+        && this.isFaceDown()) this.flip();
+  }
+
   public void flip() {
     faceDown = !faceDown;
     setImage(faceDown ? backFace : frontFace);

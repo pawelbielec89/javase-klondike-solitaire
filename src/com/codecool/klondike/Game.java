@@ -90,6 +90,7 @@ public class Game extends Pane {
         }
       };
 
+
   public boolean isGameWon() {
     int tableauEmpty = 0;
     for (int tableauPileIndex = 0; tableauPileIndex < tableauPiles.size(); tableauPileIndex++) {
@@ -104,7 +105,7 @@ public class Game extends Pane {
       System.out.print("WYGRANAAAAAAAAAAAAAAAAA!!!!!!!!!!!!!!!!!!!!!!!!!!");
       return true;
     } else {
-      System.out.print("Jeszcze nie wygrales!");
+      //System.out.print("Jeszcze nie wygrales!");
       return false;
     }
   }
@@ -213,6 +214,8 @@ public class Game extends Pane {
 
   private void handleValidMove(Card card, Pile destPile) {
     String msg = null;
+    Card lowerCard = card.getContainingPile().getLowerCard(card);    
+
     if (destPile.isEmpty()) {
       if (destPile.getPileType().equals(Pile.PileType.FOUNDATION))
         msg = String.format("Placed %s to the foundation.", card);
@@ -221,9 +224,10 @@ public class Game extends Pane {
     } else {
       msg = String.format("Placed %s to %s.", card, destPile.getTopCard());
     }
-    System.out.println(msg);
+    System.out.println(msg);    
     MouseUtil.slideToDest(draggedCards, destPile);
     draggedCards.clear();
+    if (lowerCard != null) lowerCard.autoFlip();
   }
 
   private void initPiles() {
