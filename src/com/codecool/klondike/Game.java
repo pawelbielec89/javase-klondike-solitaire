@@ -154,22 +154,36 @@ public class Game extends Pane {
 
   public boolean isMoveValid(Card card, Pile destPile) {
     if (destPile.getPileType() == PileType.TABLEAU){
-      if (destPile.numOfCards() < 1){
-        if (card.getRank() != 13) { 
-          return false; 
-        }
-        return true;
-      } else if (destPile.getTopCard().getRank() - card.getRank() != 1) {
-        return false;
-      }  else if (!Card.isOppositeColor(destPile.getTopCard(), card)) {
+      return canDragOnTableau(card, destPile);
+    } else if (destPile.getPileType() == PileType.FOUNDATION) {
+      return canDragOnFoundation(card, destPile);
+    }  
+    return true;
+  }
+
+  public boolean canDragOnTableau(Card card, Pile destPile) {
+    if (destPile.numOfCards() < 1){
+      if (card.getRank() != 13) { 
+        return false; 
+      }
+      return true;
+    } else if (destPile.getTopCard().getRank() - card.getRank() != 1) {
+      return false;
+    }  else if (!Card.isOppositeColor(destPile.getTopCard(), card)) {
+      return false;
+    }
+    return true;
+  }
+
+  public boolean canDragOnFoundation(Card card, Pile destPile) {
+    if (destPile.numOfCards() < 1) {
+      if (card.getRank() != 1) {
         return false;
       }
-    } else if (destPile.getPileType() == PileType.FOUNDATION) {
-        if (destPile.numOfCards() < 1) {
-          if (card.getRank() != 1) return false;
-        } else if (card.getRank() - destPile.getTopCard().getRank() != 1
-                    || destPile.getTopCard().getSuit() != card.getSuit()) return false;
-    }
+    } else if (card.getRank() - destPile.getTopCard().getRank() != 1
+                || destPile.getTopCard().getSuit() != card.getSuit()) {
+        return false;
+    } 
     return true;
   }
 
