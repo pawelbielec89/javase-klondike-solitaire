@@ -199,7 +199,6 @@ public class Game extends Pane {
         || destPile.getTopCard().getSuit() != card.getSuit()) {
       return false;
     }
-    return true;
   }
 
   private Pile getValidIntersectingPile(Card card, List<Pile> piles) {
