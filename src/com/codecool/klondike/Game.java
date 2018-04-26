@@ -1,18 +1,11 @@
 package com.codecool.klondike;
 
+import com.codecool.klondike.Pile.PileType;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import javafx.collections.FXCollections;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Orientation;
-import javafx.scene.control.*;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -30,6 +23,7 @@ public class Game extends Pane {
   private Pile discardPile;
   private List<Pile> foundationPiles = FXCollections.observableArrayList();
   private List<Pile> tableauPiles = FXCollections.observableArrayList();
+  private List<Pile> dragablePiles = FXCollections.observableArrayList();
 
   private double dragStartX, dragStartY;
   private List<Card> draggedCards = FXCollections.observableArrayList();
@@ -43,7 +37,8 @@ public class Game extends Pane {
   private EventHandler<MouseEvent> onMouseClickedHandler =
       e -> {
         Card card = (Card) e.getSource();
-        if (card.getContainingPile().getPileType() == Pile.PileType.STOCK) {
+        if (card.getContainingPile().getPileType() == Pile.PileType.STOCK
+            && card == stockPile.getTopCard()) {
           card.moveToPile(discardPile);
           card.flip();
           card.setMouseTransparent(false);
@@ -75,30 +70,27 @@ public class Game extends Pane {
         double offsetY = e.getSceneY() - dragStartY;
 
         draggedCards.clear();
-        draggedCards.add(card);
-
-        card.getDropShadow().setRadius(20);
-        card.getDropShadow().setOffsetX(10);
-        card.getDropShadow().setOffsetY(10);
-
-        card.toFront();
-        card.setTranslateX(offsetX);
-        card.setTranslateY(offsetY);
+        if (card == activePile.getTopCard() || (activePile != discardPile && !card.isFaceDown())) {
+          moveDraggedCards(card, offsetX, offsetY);
+        }
       };
 
   private EventHandler<MouseEvent> onMouseReleasedHandler =
       e -> {
-        if (draggedCards.isEmpty()) return;
+        if (draggedCards.isEmpty()) {
+          return;
+        }
         Card card = (Card) e.getSource();
-        Pile pile = getValidIntersectingPile(card, tableauPiles);
-        // TODO
+        dragablePiles.addAll(tableauPiles);
+        dragablePiles.addAll(foundationPiles);
+        Pile pile = getValidIntersectingPile(card, dragablePiles);
         if (pile != null) {
 
           handleValidMove(card, pile);
 
         } else {
           draggedCards.forEach(MouseUtil::slideBack);
-          draggedCards = null;
+          draggedCards.clear();
         }
         gameWon();
       };
@@ -124,12 +116,30 @@ public class Game extends Pane {
   }
 
   public Game() {
-    initToolbar();
     deck = Card.createNewDeck();
     initPiles();
     dealCards();
   }
 
+  private void moveDraggedCards(Card draggedCard, double offsetX, double offsetY) {
+    Pile activePile = draggedCard.getContainingPile();
+    int index = activePile.getCards().indexOf(draggedCard);
+    int cardsAmount = activePile.numOfCards();
+
+    for (int i = index; i < cardsAmount; i++) {
+      Card card = activePile.getCards().get(i);
+      draggedCards.add(card);
+      card.getDropShadow().setRadius(20);
+      card.getDropShadow().setOffsetX(10);
+      card.getDropShadow().setOffsetY(10);
+
+      card.toFront();
+      card.setTranslateX(offsetX + i * 5);
+      card.setTranslateY(offsetY + i * 5);
+    }
+  }
+
+  /** Sets cards on tableau in standard klondike way. */
   private void setCardsOnTableau() {
     for (int i = 0; i < 7; i++) {
       for (int j = i; j >= 0; j--) {
@@ -153,8 +163,6 @@ public class Game extends Pane {
       discardPile.getTopCard().moveToPile(stockPile);
       stockPile.getTopCard().flip();
     }
-    Collections.shuffle(stockPile.getCards());
-
     System.out.println("Stock refilled from discard pile.");
   }
 
