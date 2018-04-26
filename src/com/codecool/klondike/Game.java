@@ -1,11 +1,18 @@
 package com.codecool.klondike;
 
-import com.codecool.klondike.Pile.PileType;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
+import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -23,7 +30,6 @@ public class Game extends Pane {
   private Pile discardPile;
   private List<Pile> foundationPiles = FXCollections.observableArrayList();
   private List<Pile> tableauPiles = FXCollections.observableArrayList();
-  private List<Pile> dragablePiles = FXCollections.observableArrayList();
 
   private double dragStartX, dragStartY;
   private List<Card> draggedCards = FXCollections.observableArrayList();
@@ -32,11 +38,13 @@ public class Game extends Pane {
   private static double FOUNDATION_GAP = 0;
   private static double TABLEAU_GAP = 30;
 
+  private static List catalogue_name = new ArrayList<String>();
+  private static String actualCatalogueName = "card_images";
+
   private EventHandler<MouseEvent> onMouseClickedHandler =
       e -> {
         Card card = (Card) e.getSource();
-        if (card.getContainingPile().getPileType() == Pile.PileType.STOCK
-            && card == stockPile.getTopCard()) {
+        if (card.getContainingPile().getPileType() == Pile.PileType.STOCK) {
           card.moveToPile(discardPile);
           card.flip();
           card.setMouseTransparent(false);
@@ -45,7 +53,7 @@ public class Game extends Pane {
             && card == card.getContainingPile().getTopCard()
             && card.isFaceDown()) {
           card.flip();
-        } 
+        }
       };
 
   private EventHandler<MouseEvent> stockReverseCardsHandler =
@@ -68,73 +76,43 @@ public class Game extends Pane {
         double offsetY = e.getSceneY() - dragStartY;
 
         draggedCards.clear();
-        if (card == activePile.getTopCard() || (activePile != discardPile && !card.isFaceDown())) {
-          moveDraggedCards(card, offsetX, offsetY);
-        }
+        draggedCards.add(card);
+
+        card.getDropShadow().setRadius(20);
+        card.getDropShadow().setOffsetX(10);
+        card.getDropShadow().setOffsetY(10);
+
+        card.toFront();
+        card.setTranslateX(offsetX);
+        card.setTranslateY(offsetY);
       };
 
   private EventHandler<MouseEvent> onMouseReleasedHandler =
       e -> {
-        if (draggedCards.isEmpty()) {
-          return;
-        }
+        if (draggedCards.isEmpty()) return;
         Card card = (Card) e.getSource();
-        dragablePiles.addAll(tableauPiles);
-        dragablePiles.addAll(foundationPiles);
-        Pile pile = getValidIntersectingPile(card, dragablePiles);
+        Pile pile = getValidIntersectingPile(card, tableauPiles);
+        // TODO
         if (pile != null) {
           handleValidMove(card, pile);
         } else {
           draggedCards.forEach(MouseUtil::slideBack);
-          draggedCards.clear();
+          draggedCards = null;
         }
       };
 
-
   public boolean isGameWon() {
-    int tableauEmpty = 0;
-    for (int tableauPileIndex = 0; tableauPileIndex < tableauPiles.size(); tableauPileIndex++) {
-      if (tableauPiles.get(tableauPileIndex).isEmpty()) {
-        tableauEmpty += 0;
-      } else {
-        tableauEmpty++;
-      }
-    }
-
-    if (stockPile.isEmpty() && discardPile.isEmpty() && tableauEmpty == 0) {
-      System.out.print("WYGRANAAAAAAAAAAAAAAAAA!!!!!!!!!!!!!!!!!!!!!!!!!!");
-      return true;
-    } else {
-      //System.out.print("Jeszcze nie wygrales!");
-      return false;
-    }
+    // TODO
+    return false;
   }
 
   public Game() {
+    initToolbar();
     deck = Card.createNewDeck();
     initPiles();
     dealCards();
   }
 
-  private void moveDraggedCards(Card draggedCard, double offsetX, double offsetY) {
-    Pile activePile = draggedCard.getContainingPile();
-    int index = activePile.getCards().indexOf(draggedCard);
-    int cardsAmount = activePile.numOfCards();
-
-    for (int i = index; i < cardsAmount; i++) {
-      Card card = activePile.getCards().get(i);
-      draggedCards.add(card);
-      card.getDropShadow().setRadius(20);
-      card.getDropShadow().setOffsetX(10);
-      card.getDropShadow().setOffsetY(10);
-
-      card.toFront();
-      card.setTranslateX(offsetX + i * 5);
-      card.setTranslateY(offsetY + i * 5);
-    }
-  }
-
-  /** Sets cards on tableau in standard klondike way. */
   private void setCardsOnTableau() {
     for (int i = 0; i < 7; i++) {
       for (int j = i; j >= 0; j--) {
@@ -158,41 +136,13 @@ public class Game extends Pane {
       discardPile.getTopCard().moveToPile(stockPile);
       stockPile.getTopCard().flip();
     }
+    Collections.shuffle(stockPile.getCards());
+
     System.out.println("Stock refilled from discard pile.");
   }
 
   public boolean isMoveValid(Card card, Pile destPile) {
-    if (destPile.getPileType() == PileType.TABLEAU){
-      return canDragOnTableau(card, destPile);
-    } else if (destPile.getPileType() == PileType.FOUNDATION) {
-      return canDragOnFoundation(card, destPile);
-    }  
-    return true;
-  }
-
-  public boolean canDragOnTableau(Card card, Pile destPile) {
-    if (destPile.numOfCards() < 1){
-      if (card.getRank() != 13) { 
-        return false; 
-      }
-      return true;
-    } else if (destPile.getTopCard().getRank() - card.getRank() != 1) {
-      return false;
-    }  else if (!Card.isOppositeColor(destPile.getTopCard(), card)) {
-      return false;
-    }
-    return true;
-  }
-
-  public boolean canDragOnFoundation(Card card, Pile destPile) {
-    if (destPile.numOfCards() < 1) {
-      if (card.getRank() != 1) {
-        return false;
-      }
-    } else if (card.getRank() - destPile.getTopCard().getRank() != 1
-                || destPile.getTopCard().getSuit() != card.getSuit()) {
-        return false;
-    } 
+    // TODO
     return true;
   }
 
@@ -213,8 +163,6 @@ public class Game extends Pane {
 
   private void handleValidMove(Card card, Pile destPile) {
     String msg = null;
-    Card lowerCard = card.getContainingPile().getLowerCard(card);    
-
     if (destPile.isEmpty()) {
       if (destPile.getPileType().equals(Pile.PileType.FOUNDATION))
         msg = String.format("Placed %s to the foundation.", card);
@@ -223,11 +171,90 @@ public class Game extends Pane {
     } else {
       msg = String.format("Placed %s to %s.", card, destPile.getTopCard());
     }
-    System.out.println(msg);    
+    System.out.println(msg);
     MouseUtil.slideToDest(draggedCards, destPile);
     draggedCards.clear();
-    if (lowerCard != null) lowerCard.autoFlip();
   }
+
+  private void initToolbar() {
+    Button undoButt = new Button("Undo");
+    Button restartButt = new Button("Restart");
+    Button exitButt = new Button("Exit");
+    Button changeThemeButt = new Button("Change Theme");
+
+    exitButt.setOnAction(
+        new EventHandler<ActionEvent>() {
+          @Override
+          public void handle(ActionEvent e) {
+            exitConfirmation();
+          }
+        });
+    restartButt.setOnAction(
+        new EventHandler<ActionEvent>() {
+          @Override
+          public void handle(ActionEvent e) {
+            restartConfirmation();
+          }
+        });
+
+    changeThemeButt.setOnAction(
+        new EventHandler<ActionEvent>() {
+          @Override
+          public void handle(ActionEvent e) {
+            changeTheme();
+          }
+        });
+
+    ToolBar toolbar = new ToolBar(undoButt, restartButt, changeThemeButt, exitButt);
+    toolbar.setBackground(
+        new Background(
+            new BackgroundImage(
+                new Image("/table/green.png"),
+                BackgroundRepeat.REPEAT,
+                BackgroundRepeat.REPEAT,
+                BackgroundPosition.CENTER,
+                BackgroundSize.DEFAULT)));
+    toolbar.setLayoutX(0);
+    toolbar.setLayoutY(0);
+    toolbar.setOrientation(Orientation.VERTICAL);
+    getChildren().add(toolbar);
+  }
+
+  private void exitConfirmation() {
+    Alert alert = new Alert(AlertType.CONFIRMATION);
+    alert.setTitle("Leave game");
+    alert.setHeaderText("You going to leave game");
+    alert.setContentText("Are you sure?");
+
+    Optional<ButtonType> result = alert.showAndWait();
+    if (result.get() == ButtonType.OK) {
+      System.exit(0);
+    }
+  }
+
+  private void restartConfirmation() {
+    Alert alert = new Alert(AlertType.CONFIRMATION);
+    alert.setTitle("Restarting game");
+    alert.setHeaderText("You going to restart game");
+    alert.setContentText("Are you sure?");
+
+    Optional<ButtonType> result = alert.showAndWait();
+    if (result.get() == ButtonType.OK) {
+      for (int i = 0; i < 7; i++) {
+        tableauPiles.get(i).moveTo(stockPile);
+      }
+      for (int i = 0; i < 4; i++) {
+        foundationPiles.get(i).moveTo(stockPile);
+      }
+      System.out.println(stockPile.numOfCards());
+      stockPile.flipFaceUpCards();
+      stockPile.shufflePile();
+      setCardsOnTableau();
+      System.out.println(stockPile.numOfCards());
+    }
+  }
+
+  public void changeTheme() {}
 
   private void initPiles() {
     stockPile = new Pile(Pile.PileType.STOCK, "Stock", STOCK_GAP);
