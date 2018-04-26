@@ -1,11 +1,9 @@
 package com.codecool.klondike;
 
+import com.codecool.klondike.Pile.PileType;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import com.codecool.klondike.Pile.PileType;
-
 import javafx.collections.FXCollections;
 import javafx.event.EventHandler;
 import javafx.scene.image.Image;
@@ -36,15 +34,15 @@ public class Game extends Pane {
   private EventHandler<MouseEvent> onMouseClickedHandler =
       e -> {
         Card card = (Card) e.getSource();
-        if (card.getContainingPile().getPileType() == Pile.PileType.STOCK 
+        if (card.getContainingPile().getPileType() == Pile.PileType.STOCK
             && card == stockPile.getTopCard()) {
           card.moveToPile(discardPile);
           card.flip();
           card.setMouseTransparent(false);
           System.out.println("Placed " + card + " to the waste.");
-        } else if (card.getContainingPile().getPileType() == Pile.PileType.TABLEAU 
-                    && card == card.getContainingPile().getTopCard()
-                    && card.isFaceDown()) {
+        } else if (card.getContainingPile().getPileType() == Pile.PileType.TABLEAU
+            && card == card.getContainingPile().getTopCard()
+            && card.isFaceDown()) {
           card.flip();
         }
       };
@@ -67,17 +65,16 @@ public class Game extends Pane {
         if (activePile.getPileType() == Pile.PileType.STOCK) return;
         double offsetX = e.getSceneX() - dragStartX;
         double offsetY = e.getSceneY() - dragStartY;
-        
+
         draggedCards.clear();
-        if (card == activePile.getTopCard() 
-            || (activePile != discardPile && !card.isFaceDown())) { 
+        if (card == activePile.getTopCard() || (activePile != discardPile && !card.isFaceDown())) {
           moveDraggedCards(card, offsetX, offsetY);
-        } 
+        }
       };
-  
+
   private EventHandler<MouseEvent> onMouseReleasedHandler =
       e -> {
-        if (draggedCards.isEmpty()) { 
+        if (draggedCards.isEmpty()) {
           return;
         }
         Card card = (Card) e.getSource();
@@ -91,8 +88,22 @@ public class Game extends Pane {
       };
 
   public boolean isGameWon() {
-    // TODO
-    return false;
+    int tableauEmpty = 0;
+    for (int tableauPileIndex = 0; tableauPileIndex < tableauPiles.size(); tableauPileIndex++) {
+      if (tableauPiles.get(tableauPileIndex).isEmpty()) {
+        tableauEmpty += 0;
+      } else {
+        tableauEmpty++;
+      }
+    }
+
+    if (stockPile.isEmpty() && discardPile.isEmpty() && tableauEmpty == 0) {
+      System.out.print("WYGRANAAAAAAAAAAAAAAAAA!!!!!!!!!!!!!!!!!!!!!!!!!!");
+      return true;
+    } else {
+      System.out.print("Jeszcze nie wygrales!");
+      return false;
+    }
   }
 
   public Game() {
@@ -108,21 +119,18 @@ public class Game extends Pane {
 
     for (int i = index; i < cardsAmount; i++) {
       Card card = activePile.getCards().get(i);
-      draggedCards.add(card);            
+      draggedCards.add(card);
       card.getDropShadow().setRadius(20);
       card.getDropShadow().setOffsetX(10);
       card.getDropShadow().setOffsetY(10);
 
       card.toFront();
-      card.setTranslateX(offsetX+i*5);
-      card.setTranslateY(offsetY+i*5);
+      card.setTranslateX(offsetX + i * 5);
+      card.setTranslateY(offsetY + i * 5);
     }
   }
 
-/** 
- * Sets cards on tableau in standard klondike way.
- */
-
+  /** Sets cards on tableau in standard klondike way. */
   private void setCardsOnTableau() {
     for (int i = 0; i < 7; i++) {
       for (int j = i; j >= 0; j--) {
@@ -130,7 +138,7 @@ public class Game extends Pane {
         card.moveToPile(tableauPiles.get(i));
         if (j == 0) card.flip();
       }
-  }
+    }
   }
 
   public void addMouseEventHandlers(Card card) {
@@ -150,18 +158,19 @@ public class Game extends Pane {
   }
 
   public boolean isMoveValid(Card card, Pile destPile) {
-    if (destPile.getPileType() == PileType.TABLEAU){
-      if (destPile.numOfCards() < 1){
-        if( card.getRank() != 13) { 
-          return false; 
+    if (destPile.getPileType() == PileType.TABLEAU) {
+      if (destPile.numOfCards() < 1) {
+        if (card.getRank() != 13) {
+          return false;
         }
         return true;
       } else if (destPile.getTopCard().getRank() - card.getRank() != 1) {
         return false;
-      }  else if (!Card.isOppositeColor(destPile.getTopCard(), card)) {
+      } else if (!Card.isOppositeColor(destPile.getTopCard(), card)) {
         return false;
       }
     }
+    isGameWon();
     return true;
   }
 
@@ -171,10 +180,9 @@ public class Game extends Pane {
       if (!pile.equals(card.getContainingPile())
           && isOverPile(card, pile)
           && isMoveValid(card, pile)) result = pile;
-    } 
+    }
     return result;
   }
-
 
   private boolean isOverPile(Card card, Pile pile) {
     if (pile.isEmpty()) return card.getBoundsInParent().intersects(pile.getBoundsInParent());
@@ -226,7 +234,6 @@ public class Game extends Pane {
       tableauPiles.add(tableauPile);
       getChildren().add(tableauPile);
     }
-
   }
 
   public void dealCards() {
