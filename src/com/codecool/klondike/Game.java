@@ -38,7 +38,6 @@ public class Game extends Pane {
   private static double FOUNDATION_GAP = 0;
   private static double TABLEAU_GAP = 30;
 
-  private static List catalogue_name = new ArrayList<String>();
   private static String actualCatalogueName = "card_images";
 
   private EventHandler<MouseEvent> onMouseClickedHandler =
@@ -122,7 +121,6 @@ public class Game extends Pane {
     } else {
       System.out.println("Not yet!");
     }
-    return false;
   }
 
   public Game() {
@@ -301,10 +299,20 @@ public class Game extends Pane {
     if (actualCatalogueName.equals("/card_images")) {
       actualCatalogueName = "/new_card_images";
       Card.loadCardImages(actualCatalogueName);
+
     } else {
       actualCatalogueName = "/card_images";
       Card.loadCardImages(actualCatalogueName);
     }
+    stockPile.changeImages();
+    discardPile.changeImages();
+    for (Pile pile : foundationPiles) {
+      pile.changeImages();
+    }
+    for (Pile pile : tableauPiles) {
+      pile.changeImages();
+    }
+
     /*
     Alert alert = new Alert(AlertType.CONFIRMATION);
     alert.setTitle("Changing theme");

@@ -22,7 +22,7 @@ public class Card extends ImageView {
 
   private static final Map<Integer, SuitType> suitMap = new HashMap<>();
   private static final Map<Integer, RankType> rankMap = new HashMap<>();
-  private static final Map<String, Image> cardFaceImages = new HashMap<>();
+  public static final Map<String, Image> cardFaceImages = new HashMap<>();
   private static final Map<SuitType, Boolean> isBlackList = new HashMap<>();
 
   static {
@@ -225,5 +225,10 @@ public class Card extends ImageView {
     int getIndex() {
       return this.index;
     }
+  }
+
+  public void changeImage() {
+    frontFace = cardFaceImages.get(getShortName());
+    setImage(faceDown ? backFace : frontFace);
   }
 }
