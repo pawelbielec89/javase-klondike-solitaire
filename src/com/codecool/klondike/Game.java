@@ -80,8 +80,6 @@ public class Game extends Pane {
           return;
         }
         Card card = (Card) e.getSource();
-        dragablePiles.addAll(tableauPiles);
-        dragablePiles.addAll(foundationPiles);
         Pile pile = getValidIntersectingPile(card, dragablePiles);
         if (pile != null) {
           handleValidMove(card, pile);
@@ -201,9 +199,21 @@ public class Game extends Pane {
     if (stockPile.isEmpty() && discardPile.isEmpty()
         && isTableauFlipped()) {
           System.out.println("BENIZ BENIZ");
+          callAutoMagicEnding();
         }
     else { 
       System.out.println("Nie beniz"); 
+    }
+  }
+
+  public void callAutoMagicEnding() {
+    for (Pile tPile : tableauPiles) { 
+      for (Pile fPile : foundationPiles) {
+        if (canDragOnFoundation(tPile.getTopCard(), fPile)) {
+          Pile properPile = getValidIntersectingPile(tPile.getTopCard(), tableauPiles);
+          if (properPile != null) handleValidMove(tPile.getTopCard(), fPile);
+        }
+      }
     }
   }
 
@@ -268,6 +278,7 @@ public class Game extends Pane {
       foundationPile.setLayoutX(610 + i * 180);
       foundationPile.setLayoutY(20);
       foundationPiles.add(foundationPile);
+      dragablePiles.add(foundationPile);
       getChildren().add(foundationPile);
     }
     for (int i = 0; i < 7; i++) {
@@ -276,6 +287,7 @@ public class Game extends Pane {
       tableauPile.setLayoutX(95 + i * 180);
       tableauPile.setLayoutY(275);
       tableauPiles.add(tableauPile);
+      dragablePiles.add(tableauPile);
       getChildren().add(tableauPile);
     }
   }
