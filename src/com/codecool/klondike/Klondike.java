@@ -16,7 +16,7 @@ public class Klondike extends Application {
 
   @Override
   public void start(Stage primaryStage) {
-    Card.loadCardImages("card_images/", ".png");
+    Card.loadCardImages("card_images/");
     Game game = new Game();
     game.setTableBackground(new Image("/table/background.jpg"));
 
