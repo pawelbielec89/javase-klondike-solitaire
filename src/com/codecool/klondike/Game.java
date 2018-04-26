@@ -16,7 +16,6 @@ import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.Pane;
 
 public class Game extends Pane {
-
   private List<Card> deck = new ArrayList<>();
 
   private Pile stockPile;
@@ -45,7 +44,7 @@ public class Game extends Pane {
             && card == card.getContainingPile().getTopCard()
             && card.isFaceDown()) {
           card.flip();
-        } 
+        }
       };
 
   private EventHandler<MouseEvent> stockReverseCardsHandler =
@@ -83,29 +82,33 @@ public class Game extends Pane {
         dragablePiles.addAll(foundationPiles);
         Pile pile = getValidIntersectingPile(card, dragablePiles);
         if (pile != null) {
+
           handleValidMove(card, pile);
+
         } else {
           draggedCards.forEach(MouseUtil::slideBack);
           draggedCards.clear();
         }
+        gameWon();
       };
 
   public boolean isGameWon() {
-    int tableauEmpty = 0;
-    for (int tableauPileIndex = 0; tableauPileIndex < tableauPiles.size(); tableauPileIndex++) {
-      if (tableauPiles.get(tableauPileIndex).isEmpty()) {
-        tableauEmpty += 0;
-      } else {
-        tableauEmpty++;
-      }
+    int allCards = 52;
+    int pileFull = 0;
+    for (int foundationPileIndex = 0; foundationPileIndex < 4; foundationPileIndex++) {
+      pileFull += foundationPiles.get(foundationPileIndex).numOfCards();
     }
-
-    if (stockPile.isEmpty() && discardPile.isEmpty() && tableauEmpty == 0) {
-      System.out.print("WYGRANAAAAAAAAAAAAAAAAA!!!!!!!!!!!!!!!!!!!!!!!!!!");
+    if (pileFull == (allCards - 1)) {
       return true;
+    }
+    return false;
+  }
+
+  public void gameWon() {
+    if (isGameWon()) {
+      System.out.println("Game is won!");
     } else {
-      System.out.print("Jeszcze nie wygrales!");
-      return false;
+      System.out.println("Not yet!");
     }
   }
 
@@ -161,26 +164,26 @@ public class Game extends Pane {
   }
 
   public boolean isMoveValid(Card card, Pile destPile) {
-    if (destPile.getPileType() == PileType.TABLEAU){
+    if (destPile.getPileType() == PileType.TABLEAU) {
       return canDragOnTableau(card, destPile);
     } else if (destPile.getPileType() == PileType.FOUNDATION) {
       return canDragOnFoundation(card, destPile);
-    }  
+    }
     return true;
   }
 
   public boolean canDragOnTableau(Card card, Pile destPile) {
-    if (destPile.numOfCards() < 1){
-      if (card.getRank() != 13) { 
-        return false; 
+    if (destPile.numOfCards() < 1) {
+      if (card.getRank() != 13) {
+        return false;
       }
       return true;
     } else if (destPile.getTopCard().getRank() - card.getRank() != 1) {
       return false;
-    }  else if (!Card.isOppositeColor(destPile.getTopCard(), card)) {
+    } else if (!Card.isOppositeColor(destPile.getTopCard(), card)) {
       return false;
     }
-    isGameWon();
+
     return true;
   }
 
@@ -190,9 +193,9 @@ public class Game extends Pane {
         return false;
       }
     } else if (card.getRank() - destPile.getTopCard().getRank() != 1
-                || destPile.getTopCard().getSuit() != card.getSuit()) {
-        return false;
-    } 
+        || destPile.getTopCard().getSuit() != card.getSuit()) {
+      return false;
+    }
     return true;
   }
 
