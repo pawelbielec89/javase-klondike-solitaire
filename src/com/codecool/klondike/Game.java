@@ -177,6 +177,7 @@ public class Game extends Pane {
     Button undoButt = new Button("Undo");
     Button restartButt = new Button("Restart");
     Button exitButt = new Button("Exit");
+    Button changeThemeButt = new Button("Change Theme");
 
     exitButt.setOnAction(
         new EventHandler<ActionEvent>() {
@@ -193,7 +194,15 @@ public class Game extends Pane {
           }
         });
 
-    ToolBar toolbar = new ToolBar(undoButt, restartButt, exitButt);
+    changeThemeButt.setOnAction(
+        new EventHandler<ActionEvent>() {
+          @Override
+          public void handle(ActionEvent e) {
+            changeTheme();
+          }
+        });
+
+    ToolBar toolbar = new ToolBar(undoButt, restartButt, changeThemeButt, exitButt);
     toolbar.setBackground(
         new Background(
             new BackgroundImage(
