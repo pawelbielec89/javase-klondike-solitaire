@@ -155,8 +155,8 @@ public class Card extends ImageView {
     return result;
   }
 
-  public static void loadCardImages() {
-    cardBackImage = new Image("card_images/card_back.png");
+  public static void loadCardImages(String catalogue_name, String imageFormat) {
+    cardBackImage = new Image(catalogue_name + "back.jpg");
     String suitName = "";
     int suitToPass;
     for (int suit = 1; suit < 5; suit++) {
@@ -166,11 +166,12 @@ public class Card extends ImageView {
       for (int rank = 1; rank < 14; rank++) {
         String cardName = suitName + rank;
         String cardId = "S" + suitToPass + "R" + rank;
-        String imageFileName = "card_images/" + cardName + ".png";
+        String imageFileName = catalogue_name + cardName + imageFormat;
         cardFaceImages.put(cardId, new Image(imageFileName));
       }
     }
   }
+
 
   public enum SuitType {
     HEARTS(1, "hearts"),

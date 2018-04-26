@@ -181,7 +181,6 @@ public class Game extends Pane {
     }  else if (!Card.isOppositeColor(destPile.getTopCard(), card)) {
       return false;
     }
-    isGameWon();
     return true;
   }
 
