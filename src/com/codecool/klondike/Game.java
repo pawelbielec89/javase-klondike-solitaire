@@ -58,7 +58,8 @@ public class Game extends Pane {
 
   private EventHandler<MouseEvent> stockReverseCardsHandler =
       e -> {
-        refillStockFromDiscard(discardPile);
+        if (stockPile.isEmpty())        
+          refillStockFromDiscard(discardPile);
       };
 
   private EventHandler<MouseEvent> onMousePressedHandler =
@@ -87,8 +88,6 @@ public class Game extends Pane {
           return;
         }
         Card card = (Card) e.getSource();
-        dragablePiles.addAll(tableauPiles);
-        dragablePiles.addAll(foundationPiles);
         Pile pile = getValidIntersectingPile(card, dragablePiles);
         if (pile != null) {
 
@@ -239,6 +238,35 @@ public class Game extends Pane {
     return true;
   }
 
+  public void autoFinish() {
+    if (stockPile.isEmpty() && discardPile.isEmpty()
+        && isTableauFlipped()) {
+          System.out.println("BENIZ BENIZ");
+          callAutoMagicEnding();
+        }
+    else { 
+      System.out.println("Nie beniz"); 
+    }
+  }
+
+  public void callAutoMagicEnding() {
+    for (Pile tPile : tableauPiles) { 
+      for (Pile fPile : foundationPiles) {
+        if (canDragOnFoundation(tPile.getTopCard(), fPile)) {
+          Pile properPile = getValidIntersectingPile(tPile.getTopCard(), tableauPiles);
+          if (properPile != null) handleValidMove(tPile.getTopCard(), fPile);
+        }
+      }
+    }
+  }
+
+  private boolean isTableauFlipped() {
+    for (Pile pile : tableauPiles) {
+      if (!pile.allCardsFlipped()) return false;
+    }
+    return true;
+  }
+ 
   private Pile getValidIntersectingPile(Card card, List<Pile> piles) {
     Pile result = null;
     for (Pile pile : piles) {
@@ -256,6 +284,8 @@ public class Game extends Pane {
 
   private void handleValidMove(Card card, Pile destPile) {
     String msg = null;
+    Card lowerCard = card.getContainingPile().getLowerCard(card);
+
     if (destPile.isEmpty()) {
       if (destPile.getPileType().equals(Pile.PileType.FOUNDATION))
         msg = String.format("Placed %s to the foundation.", card);
@@ -267,6 +297,8 @@ public class Game extends Pane {
     System.out.println(msg);
     MouseUtil.slideToDest(draggedCards, destPile);
     draggedCards.clear();
+    if (lowerCard != null) lowerCard.autoFlip();
+    autoFinish();
   }
 
   private void initToolbar() {
@@ -395,6 +427,7 @@ public class Game extends Pane {
       foundationPile.setLayoutX(610 + i * 180);
       foundationPile.setLayoutY(20);
       foundationPiles.add(foundationPile);
+      dragablePiles.add(foundationPile);
       getChildren().add(foundationPile);
     }
     for (int i = 0; i < 7; i++) {
@@ -403,6 +436,7 @@ public class Game extends Pane {
       tableauPile.setLayoutX(95 + i * 180);
       tableauPile.setLayoutY(275);
       tableauPiles.add(tableauPile);
+      dragablePiles.add(tableauPile);
       getChildren().add(tableauPile);
     }
   }

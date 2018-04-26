@@ -59,6 +59,12 @@ public class Pile extends Pane {
     layoutCard(card);
   }
 
+  public boolean allCardsFlipped() {
+    for (int i = 0; i < cards.size(); i++)
+      if (cards.get(i).isFaceDown()) return false;
+    return true;
+  }
+
   private void layoutCard(Card card) {
     card.relocate(
         card.getLayoutX() + card.getTranslateX(), card.getLayoutY() + card.getTranslateY());
