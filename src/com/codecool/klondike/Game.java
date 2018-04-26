@@ -70,34 +70,12 @@ public class Game extends Pane {
         double offsetY = e.getSceneY() - dragStartY;
         
         draggedCards.clear();
-        if (card == activePile.getTopCard()) { 
-          draggedCards.add(card);
-          card.getDropShadow().setRadius(20);
-          card.getDropShadow().setOffsetX(10);
-          card.getDropShadow().setOffsetY(10);
-  
-          card.toFront();
-          card.setTranslateX(offsetX);
-          card.setTranslateY(offsetY);
-        } else if (activePile != discardPile && !card.isFaceDown) {
-          for (int i = activePile.getCards().indexOf(card); i < activePile.getCards().size(); i++) {
-            Card dCard = activePile.getCards().get(i);
-            draggedCards.add(dCard);
-            dCard.getDropShadow().setRadius(20);
-            dCard.getDropShadow().setOffsetX(10);
-            dCard.getDropShadow().setOffsetY(10);
-    
-            dCard.toFront();
-            dCard.setTranslateX(offsetX+i*10);
-            dCard.setTranslateY(offsetY+i*5);
-            
-          }
-        }
-
-    
-        
+        if (card == activePile.getTopCard() 
+            || (activePile != discardPile && !card.isFaceDown())) { 
+          moveDraggedCards(card, offsetX, offsetY);
+        } 
       };
-
+  
   private EventHandler<MouseEvent> onMouseReleasedHandler =
       e -> {
         if (draggedCards.isEmpty()) { 
@@ -122,6 +100,24 @@ public class Game extends Pane {
     deck = Card.createNewDeck();
     initPiles();
     dealCards();
+  }
+
+  private void moveDraggedCards(Card draggedCard, double offsetX, double offsetY) {
+    Pile activePile = draggedCard.getContainingPile();
+    int index = activePile.getCards().indexOf(draggedCard);
+    int cardsAmount = activePile.numOfCards();
+
+    for (int i = index; i < cardsAmount; i++) {
+      Card card = activePile.getCards().get(i);
+      draggedCards.add(card);            
+      card.getDropShadow().setRadius(20);
+      card.getDropShadow().setOffsetX(10);
+      card.getDropShadow().setOffsetY(10);
+
+      card.toFront();
+      card.setTranslateX(offsetX+i*5);
+      card.setTranslateY(offsetY+i*5);
+    }
   }
 
 /** 
@@ -164,7 +160,6 @@ public class Game extends Pane {
         }
         return true;
       } else if (destPile.getTopCard().getRank() - card.getRank() != 1) {
-        System.out.println(destPile.getTopCard().getRank() + "benizzz");
         return false;
       }  else if (destPile.getTopCard().getSuit() > 2 && card.getSuit() > 2
                   || destPile.getTopCard().getSuit() < 3 && card.getSuit() < 3) {
