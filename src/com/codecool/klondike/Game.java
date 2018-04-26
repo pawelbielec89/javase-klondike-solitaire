@@ -115,7 +115,6 @@ public class Game extends Pane {
     } else {
       System.out.println("Not yet!");
     }
-    return false;
   }
 
   public Game() {
@@ -154,9 +153,9 @@ public class Game extends Pane {
   }
 
   public boolean isMoveValid(Card card, Pile destPile) {
-    if (destPile.getPileType() == PileType.TABLEAU) {
+    if (destPile.getPileType() == Pile.PileType.TABLEAU) {
       return canDragOnTableau(card, destPile);
-    } else if (destPile.getPileType() == PileType.FOUNDATION) {
+    } else if (destPile.getPileType() == Pile.PileType.FOUNDATION) {
       return canDragOnFoundation(card, destPile);
     }
     return true;
@@ -186,6 +185,7 @@ public class Game extends Pane {
         || destPile.getTopCard().getSuit() != card.getSuit()) {
       return false;
     }
+    return true;
   }
 
   private Pile getValidIntersectingPile(Card card, List<Pile> piles) {
