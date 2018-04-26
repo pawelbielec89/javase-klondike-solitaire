@@ -114,6 +114,11 @@ public class Card extends ImageView {
     destPile.addCard(this);
   }
 
+  public void autoFlip() {
+    if (this.getContainingPile().getPileType() == Pile.PileType.TABLEAU && this.isFaceDown())
+      this.flip();
+  }
+
   public void flip() {
     faceDown = !faceDown;
     setImage(faceDown ? backFace : frontFace);
@@ -150,8 +155,8 @@ public class Card extends ImageView {
     return result;
   }
 
-  public static void loadCardImages() {
-    cardBackImage = new Image("card_images/card_back.png");
+  public static void loadCardImages(String catalogue_name) {
+    cardBackImage = new Image(catalogue_name + "back.png");
     String suitName = "";
     int suitToPass;
     for (int suit = 1; suit < 5; suit++) {
@@ -161,7 +166,7 @@ public class Card extends ImageView {
       for (int rank = 1; rank < 14; rank++) {
         String cardName = suitName + rank;
         String cardId = "S" + suitToPass + "R" + rank;
-        String imageFileName = "card_images/" + cardName + ".png";
+        String imageFileName = catalogue_name + cardName + ".png";
         cardFaceImages.put(cardId, new Image(imageFileName));
       }
     }

@@ -16,6 +16,7 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.BackgroundImage;
 import javafx.scene.layout.BackgroundPosition;
 import javafx.scene.layout.BackgroundRepeat;
@@ -37,6 +38,9 @@ public class Game extends Pane {
   private static double STOCK_GAP = 1;
   private static double FOUNDATION_GAP = 0;
   private static double TABLEAU_GAP = 30;
+
+  private static List catalogue_name = new ArrayList<String>();
+  private static String actualCatalogueName = "card_images";
 
   private EventHandler<MouseEvent> onMouseClickedHandler =
       e -> {
@@ -203,14 +207,7 @@ public class Game extends Pane {
         });
 
     ToolBar toolbar = new ToolBar(undoButt, restartButt, changeThemeButt, exitButt);
-    toolbar.setBackground(
-        new Background(
-            new BackgroundImage(
-                new Image("/table/green.png"),
-                BackgroundRepeat.REPEAT,
-                BackgroundRepeat.REPEAT,
-                BackgroundPosition.CENTER,
-                BackgroundSize.DEFAULT)));
+    toolbar.setBackground(new Background(new BackgroundFill(null, null, null)));
     toolbar.setLayoutX(0);
     toolbar.setLayoutY(0);
     toolbar.setOrientation(Orientation.VERTICAL);
@@ -249,6 +246,27 @@ public class Game extends Pane {
       setCardsOnTableau();
       System.out.println(stockPile.numOfCards());
     }
+  }
+
+  public void changeTheme() {
+    if (actualCatalogueName.equals("/card_images")) {
+      actualCatalogueName = "/new_card_images";
+      Card.loadCardImages(actualCatalogueName);
+    } else {
+      actualCatalogueName = "/card_images";
+      Card.loadCardImages(actualCatalogueName);
+    }
+    /*
+    Alert alert = new Alert(AlertType.CONFIRMATION);
+    alert.setTitle("Changing theme");
+    alert.setHeaderText("Which theme do you want?");
+    alert.setContentText("Select one");
+    ButtonType optionOne = new ButtonType("One");
+    ButtonType optionTwo = new ButtonType("Two");
+    Image imageOne = new Image(getClass().getResourceAsStream("/card_images/back.jpg"));
+    optionOne.setGraphic(new ImageView(imageOne));
+    Optional<ButtonType> result = alert.showAndWait();
+    */
   }
 
   private void initPiles() {
