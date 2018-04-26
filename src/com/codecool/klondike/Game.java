@@ -50,7 +50,8 @@ public class Game extends Pane {
 
   private EventHandler<MouseEvent> stockReverseCardsHandler =
       e -> {
-        refillStockFromDiscard(discardPile);
+        if (stockPile.isEmpty())        
+          refillStockFromDiscard(discardPile);
       };
 
   private EventHandler<MouseEvent> onMousePressedHandler =
@@ -196,6 +197,23 @@ public class Game extends Pane {
     return true;
   }
 
+  public void autoFinish() {
+    if (stockPile.isEmpty() && discardPile.isEmpty()
+        && isTableauFlipped()) {
+          System.out.println("BENIZ BENIZ");
+        }
+    else { 
+      System.out.println("Nie beniz"); 
+    }
+  }
+
+  private boolean isTableauFlipped() {
+    for (Pile pile : tableauPiles) {
+      if (!pile.allCardsFlipped()) return false;
+    }
+    return true;
+  }
+ 
   private Pile getValidIntersectingPile(Card card, List<Pile> piles) {
     Pile result = null;
     for (Pile pile : piles) {
@@ -227,6 +245,7 @@ public class Game extends Pane {
     MouseUtil.slideToDest(draggedCards, destPile);
     draggedCards.clear();
     if (lowerCard != null) lowerCard.autoFlip();
+    autoFinish();
   }
 
   private void initPiles() {
