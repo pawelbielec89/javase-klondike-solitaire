@@ -114,14 +114,11 @@ public class Card extends ImageView {
     destPile.addCard(this);
   }
 
-<<<<<<< HEAD
   public void autoFlip() {
     if (this.getContainingPile().getPileType() == Pile.PileType.TABLEAU && this.isFaceDown())
       this.flip();
   }
 
-=======
->>>>>>> parent of d9b27cb... Merge branch 'Dev' of https://github.com/CodecoolKRK20173/javase-klondike-solitaire-pawel-kuba into Dev
   public void flip() {
     faceDown = !faceDown;
     setImage(faceDown ? backFace : frontFace);
@@ -158,13 +155,8 @@ public class Card extends ImageView {
     return result;
   }
 
-<<<<<<< HEAD
   public static void loadCardImages(String catalogue_name) {
     cardBackImage = new Image(catalogue_name + "back.png");
-=======
-  public static void loadCardImages() {
-    cardBackImage = new Image("card_images/card_back.png");
->>>>>>> parent of d9b27cb... Merge branch 'Dev' of https://github.com/CodecoolKRK20173/javase-klondike-solitaire-pawel-kuba into Dev
     String suitName = "";
     int suitToPass;
     for (int suit = 1; suit < 5; suit++) {
@@ -174,11 +166,7 @@ public class Card extends ImageView {
       for (int rank = 1; rank < 14; rank++) {
         String cardName = suitName + rank;
         String cardId = "S" + suitToPass + "R" + rank;
-<<<<<<< HEAD
         String imageFileName = catalogue_name + cardName + ".png";
-=======
-        String imageFileName = "card_images/" + cardName + ".png";
->>>>>>> parent of d9b27cb... Merge branch 'Dev' of https://github.com/CodecoolKRK20173/javase-klondike-solitaire-pawel-kuba into Dev
         cardFaceImages.put(cardId, new Image(imageFileName));
       }
     }

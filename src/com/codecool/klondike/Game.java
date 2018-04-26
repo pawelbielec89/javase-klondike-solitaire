@@ -1,11 +1,17 @@
 package com.codecool.klondike;
 
-import com.codecool.klondike.Pile.PileType;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Orientation;
+import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ToolBar;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Background;
@@ -32,11 +38,8 @@ public class Game extends Pane {
   private static double FOUNDATION_GAP = 0;
   private static double TABLEAU_GAP = 30;
 
-<<<<<<< HEAD
   private static String actualCatalogueName = "card_images";
 
-=======
->>>>>>> parent of d9b27cb... Merge branch 'Dev' of https://github.com/CodecoolKRK20173/javase-klondike-solitaire-pawel-kuba into Dev
   private EventHandler<MouseEvent> onMouseClickedHandler =
       e -> {
         Card card = (Card) e.getSource();
@@ -119,6 +122,7 @@ public class Game extends Pane {
   }
 
   public Game() {
+    initToolbar();
     deck = Card.createNewDeck();
     initPiles();
     dealCards();
@@ -170,9 +174,9 @@ public class Game extends Pane {
   }
 
   public boolean isMoveValid(Card card, Pile destPile) {
-    if (destPile.getPileType() == PileType.TABLEAU) {
+    if (destPile.getPileType() == Pile.PileType.TABLEAU) {
       return canDragOnTableau(card, destPile);
-    } else if (destPile.getPileType() == PileType.FOUNDATION) {
+    } else if (destPile.getPileType() == Pile.PileType.FOUNDATION) {
       return canDragOnFoundation(card, destPile);
     }
     return true;
@@ -202,6 +206,7 @@ public class Game extends Pane {
         || destPile.getTopCard().getSuit() != card.getSuit()) {
       return false;
     }
+    return true;
   }
 
   private Pile getValidIntersectingPile(Card card, List<Pile> piles) {
@@ -234,7 +239,6 @@ public class Game extends Pane {
     draggedCards.clear();
   }
 
-<<<<<<< HEAD
   private void initToolbar() {
     Button undoButt = new Button("Undo");
     Button restartButt = new Button("Restart");
@@ -307,12 +311,12 @@ public class Game extends Pane {
   }
 
   public void changeTheme() {
-    if (actualCatalogueName.equals("/card_images")) {
-      actualCatalogueName = "/new_card_images";
+    if (actualCatalogueName.equals("card_images/")) {
+      actualCatalogueName = "new_card_images/";
       Card.loadCardImages(actualCatalogueName);
 
     } else {
-      actualCatalogueName = "/card_images";
+      actualCatalogueName = "card_images/";
       Card.loadCardImages(actualCatalogueName);
     }
     stockPile.changeImages();
@@ -337,8 +341,6 @@ public class Game extends Pane {
     */
   }
 
-=======
->>>>>>> parent of d9b27cb... Merge branch 'Dev' of https://github.com/CodecoolKRK20173/javase-klondike-solitaire-pawel-kuba into Dev
   private void initPiles() {
     stockPile = new Pile(Pile.PileType.STOCK, "Stock", STOCK_GAP);
     stockPile.setBlurredBackground();
