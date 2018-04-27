@@ -58,8 +58,7 @@ public class Game extends Pane {
 
   private EventHandler<MouseEvent> stockReverseCardsHandler =
       e -> {
-        if (stockPile.isEmpty())        
-          refillStockFromDiscard(discardPile);
+        if (stockPile.isEmpty()) refillStockFromDiscard(discardPile);
       };
 
   private EventHandler<MouseEvent> onMousePressedHandler =
@@ -106,7 +105,7 @@ public class Game extends Pane {
     for (int foundationPileIndex = 0; foundationPileIndex < 4; foundationPileIndex++) {
       pileFull += foundationPiles.get(foundationPileIndex).numOfCards();
     }
-    if (pileFull == (allCards - 1)) {
+    if (pileFull == (allCards - 50)) {
       return true;
     }
     return false;
@@ -238,19 +237,17 @@ public class Game extends Pane {
     return true;
   }
 
-  public void autoFinish() {
-    if (stockPile.isEmpty() && discardPile.isEmpty()
-        && isTableauFlipped()) {
-          System.out.println("BENIZ BENIZ");
-          callAutoMagicEnding();
-        }
-    else { 
-      System.out.println("Nie beniz"); 
-    }
-  }
+  // public void autoFinish() {
+  //   if (stockPile.isEmpty() && discardPile.isEmpty() && isTableauFlipped()) {
+  //     System.out.println("BENIZ BENIZ");
+  //     callAutoMagicEnding();
+  //   } else {
+  //     System.out.println("Nie beniz");
+  //   }
+  // }
 
   public void callAutoMagicEnding() {
-    for (Pile tPile : tableauPiles) { 
+    for (Pile tPile : tableauPiles) {
       for (Pile fPile : foundationPiles) {
         if (canDragOnFoundation(tPile.getTopCard(), fPile)) {
           Pile properPile = getValidIntersectingPile(tPile.getTopCard(), tableauPiles);
@@ -266,7 +263,7 @@ public class Game extends Pane {
     }
     return true;
   }
- 
+
   private Pile getValidIntersectingPile(Card card, List<Pile> piles) {
     Pile result = null;
     for (Pile pile : piles) {
@@ -298,7 +295,7 @@ public class Game extends Pane {
     MouseUtil.slideToDest(draggedCards, destPile);
     draggedCards.clear();
     if (lowerCard != null) lowerCard.autoFlip();
-    autoFinish();
+    //  autoFinish();
   }
 
   private void initToolbar() {
@@ -373,6 +370,8 @@ public class Game extends Pane {
       putStockToDiscard(stockPile);
       refillStockFromDiscard(discardPile);
       System.out.println(stockPile.numOfCards());
+    } else {
+      System.exit(0);
     }
   }
 
